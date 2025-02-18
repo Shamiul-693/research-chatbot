@@ -15,7 +15,7 @@ st.set_page_config(page_title="AI Research Chatbot", page_icon="🤖", layout="w
 
 # Sidebar
 st.sidebar.title("🔍 Research Assistant Chatbot")
-st.sidebar.write("💡 **Powered by Shamiul Islam https://www.facebook.com/samiulislam.693 **")
+st.sidebar.write("💡Powered by Shamiul Islam https://www.facebook.com/samiulislam.693 ")
 st.sidebar.write("📝 Ask research-related questions and get instant AI-generated insights.")
 
 # Initialize chat history
