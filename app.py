@@ -15,15 +15,15 @@ st.set_page_config(page_title="AI Research Chatbot", page_icon="🤖", layout="w
 
 # Sidebar
 st.sidebar.title("🔍 Research Assistant Chatbot")
-st.sidebar.write("💡 **Powered by Google Gemini AI**")
-st.sidebar.write("📝 Chat with AI about research topics in real time.")
+st.sidebar.write("💡 **Powered by Shamiul Islam https://www.facebook.com/samiulislam.693 **")
+st.sidebar.write("📝 Ask research-related questions and get instant AI-generated insights.")
 
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Display Chat Messages
-st.title("🚀 AI Research Assistant (Conversational Mode)")
+st.title("🚀 AI Research Assistant SamBotChat")
 
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
