@@ -1,6 +1,5 @@
 import streamlit as st
 import google.generativeai as genai
-import PyMuPDF  # For PDF processing
 import docx  # For DOCX processing
 import fitz
 # Set up API key (Replace with your actual API key)
