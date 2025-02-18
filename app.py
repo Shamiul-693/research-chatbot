@@ -30,10 +30,10 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # User Input
-if st.button("Ask AI 🤖"):
-    if user_input.strip():
-        # Append user message to session state
-        st.session_state.messages.append({"role": "user", "content": user_input})
+user_input = st.chat_input("Type your question here...")
+if user_input:
+    # Append user message to session state
+    st.session_state.messages.append({"role": "user", "content": user_input})
     # Display user message
     with st.chat_message("user"):
         st.markdown(user_input)
