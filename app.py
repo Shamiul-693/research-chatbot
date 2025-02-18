@@ -10,30 +10,42 @@ def chat_with_gemini(prompt):
     response = model.generate_content(prompt)
     return response.text
 
-# Streamlit UI with Sidebar
-st.set_page_config(page_title="AI Research Assistant", page_icon="🤖", layout="wide")
+# Streamlit UI with Chat History
+st.set_page_config(page_title="AI Research Chatbot", page_icon="🤖", layout="wide")
 
 # Sidebar
-st.sidebar.title("🔍 Research Assistant SamBotChat")
-st.sidebar.write("💡 **Powered by  Shamiul Islam https://www.facebook.com/samiulislam.693**")
-st.sidebar.write("📝 Ask research-related questions and get instant AI-generated insights.")
+st.sidebar.title("🔍 Research Assistant Chatbot")
+st.sidebar.write("💡 **Powered by Google Gemini AI**")
+st.sidebar.write("📝 Chat with AI about research topics in real time.")
 
-# Main Title with Styling
-st.markdown("<h1 style='text-align: center; color: #4CAF50;'>🚀 AI Research Assistant</h1>", unsafe_allow_html=True)
-st.write("### Ask your research-related question below:")
+# Initialize chat history
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# Text Input Area
-user_input = st.text_area("💬 Your question:", placeholder="Type your question here...", height=150)
+# Display Chat Messages
+st.title("🚀 AI Research Assistant (Conversational Mode)")
 
-# Submit Button
-if st.button("Ask AI 🤖"):
-    if user_input.strip():
-        with st.spinner("Generating response... ⏳"):
-            response = chat_with_gemini(user_input)
-        st.success("✅ AI Response:")
-        st.write(response)
-    else:
-        st.warning("⚠️ Please enter a question before submitting!")
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
-# Footer
-st.markdown("<br><hr><p style='text-align: center;'>🔬 AI-Powered Research Assistant | Built with Streamlight by Sami </p>", unsafe_allow_html=True)
+# User Input
+user_input = st.chat_input("Type your question here...")
+if user_input:
+    # Append user message to session state
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    
+    # Display user message
+    with st.chat_message("user"):
+        st.markdown(user_input)
+    
+    # Get AI response
+    with st.spinner("Thinking... 🤖💭"):
+        ai_response = chat_with_gemini(user_input)
+    
+    # Append AI response to session state
+    st.session_state.messages.append({"role": "assistant", "content": ai_response})
+    
+    # Display AI response
+    with st.chat_message("assistant"):
+        st.markdown(ai_response)
