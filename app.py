@@ -24,7 +24,7 @@ if "messages" not in st.session_state:
 
 # Display Chat Messages
 st.title("🚀 AI Research Assistant SamBotChat")
-
+st.write("### Ask your research-related question below:")
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
