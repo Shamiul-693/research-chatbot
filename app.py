@@ -24,17 +24,16 @@ if "messages" not in st.session_state:
 
 # Display Chat Messages
 st.title("🚀 AI Research Assistant SamBotChat")
-st.write("### Ask your research-related question below:")
+
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
 # User Input
-user_input = st.chat_input("Type your question here...")
-if user_input:
-    # Append user message to session state
-    st.session_state.messages.append({"role": "user", "content": user_input})
-    
+if st.button("Ask AI 🤖"):
+    if user_input.strip():
+        # Append user message to session state
+        st.session_state.messages.append({"role": "user", "content": user_input})
     # Display user message
     with st.chat_message("user"):
         st.markdown(user_input)
