@@ -15,7 +15,7 @@ st.set_page_config(page_title="AI Research Assistant", page_icon="🤖", layout=
 
 # Sidebar
 st.sidebar.title("🔍 Research Assistant SamBotChat")
-st.sidebar.write("💡 **Powered by  Shamiul Islam**")
+st.sidebar.write("💡 **Powered by  Shamiul Islam https://www.facebook.com/samiulislam.693**")
 st.sidebar.write("📝 Ask research-related questions and get instant AI-generated insights.")
 
 # Main Title with Styling
