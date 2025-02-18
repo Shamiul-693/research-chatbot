@@ -13,26 +13,23 @@ def chat_with_gemini(prompt):
 
 # Function to extract text from uploaded file
 def extract_text_from_file(uploaded_file):
-    file_type = uploaded_file.type
+    if uploaded_file is not None:
+        file_type = uploaded_file.type
 
-    # Extract text from PDF
-    if file_type == "application/pdf":
-        doc = PyMuPDF.open(stream=uploaded_file.read(), filetype="pdf")
-        text = "\n".join([page.get_text() for page in doc])
-        return text
+        if file_type == "application/pdf":
+            doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")  # ✅ Use `fitz.open()`
+            text = ""
+            for page in doc:
+                text += page.get_text("text")  # ✅ Extract text correctly
+            return text
 
-    # Extract text from DOCX
-    elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        doc = docx.Document(uploaded_file)
-        text = "\n".join([para.text for para in doc.paragraphs])
-        return text
+        elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            doc = docx.Document(uploaded_file)
+            text = "\n".join([para.text for para in doc.paragraphs])
+            return text
 
-    # Extract text from TXT
-    elif file_type == "text/plain":
-        return uploaded_file.read().decode("utf-8")
-
-    else:
-        return "⚠️ Unsupported file format. Please upload PDF, DOCX, or TXT."
+        else:
+            return "❌ Unsupported file format. Please upload a PDF or DOCX file."
 
 # Streamlit UI with Chat History
 st.set_page_config(page_title="AI Research Chatbot", page_icon="🤖", layout="wide")
