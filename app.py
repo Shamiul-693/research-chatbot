@@ -4,14 +4,27 @@ import docx
 import fitz  # PyMuPDF for PDF handling
 import os
 
-# Set up API key securely
-genai.configure(api_key=st.secrets["AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM"])
+# Configure API Key securely
+api_key = st.secrets.get("gemini_api_key", os.getenv("AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM"))
 
-# Function to chat with Gemini AI
-def chat_with_gemini(prompt):
+if not api_key:
+    st.error("❌ Missing API Key! Please set GEMINI_API_KEY in Streamlit Secrets or as an environment variable.")
+    st.stop()
+
+try:
+    genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-pro")
-    response = model.generate_content(prompt)
-    return response.text
+except Exception as e:
+    st.error(f"⚠️ Error configuring Gemini API: {e}")
+    st.stop()
+
+# Function to interact with Gemini AI
+def chat_with_gemini(prompt):
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"⚠️ Error generating response: {e}"
 
 # Function to extract text from uploaded files
 def extract_text_from_file(uploaded_file):
@@ -20,20 +33,24 @@ def extract_text_from_file(uploaded_file):
 
     file_type = uploaded_file.type
 
-    if file_type == "application/pdf":
-        doc = fitz.open(stream=uploaded_file.getvalue(), filetype="pdf")  # Proper PDF handling
-        text = "\n".join([page.get_text("text") for page in doc])
-        return text if text.strip() else "⚠️ No readable text found in the PDF."
+    try:
+        if file_type == "application/pdf":
+            doc = fitz.open(stream=uploaded_file.getvalue(), filetype="pdf")
+            text = "\n".join([page.get_text("text") for page in doc])
+            return text if text.strip() else "⚠️ No readable text found in the PDF."
 
-    elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        doc = docx.Document(uploaded_file)
-        text = "\n".join([para.text for para in doc.paragraphs])
-        return text if text.strip() else "⚠️ No readable text found in the DOCX."
+        elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            doc = docx.Document(uploaded_file)
+            text = "\n".join([para.text for para in doc.paragraphs])
+            return text if text.strip() else "⚠️ No readable text found in the DOCX."
 
-    elif file_type == "text/plain":
-        return uploaded_file.read().decode("utf-8")
+        elif file_type == "text/plain":
+            return uploaded_file.read().decode("utf-8")
 
-    return "❌ Unsupported file format. Please upload a PDF, DOCX, or TXT file."
+        else:
+            return "❌ Unsupported file format. Please upload a PDF, DOCX, or TXT file."
+    except Exception as e:
+        return f"⚠️ Error processing file: {e}"
 
 # Streamlit UI
 st.set_page_config(page_title="AI Research Chatbot", page_icon="🤖", layout="wide")
