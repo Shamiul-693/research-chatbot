@@ -4,7 +4,7 @@ import docx
 import fitz
 
 # Configure API key from Streamlit secrets
-genai.configure(api_key=st.secrets["AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM"])
+genai.configure(api_key=st.secrets["AIzaSyCxpgc1W-doNwBBa32_L3jjQi1TWVu5D6g"])
 
 # Function to chat with Gemini AI
 def chat_with_gemini(prompt):
