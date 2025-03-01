@@ -3,7 +3,7 @@ import google.generativeai as genai
 import docx  # For DOCX processing
 import fitz
 # Set up API key (Replace with your actual API key)
-genai.configure(api_key="AIzaSyCT-bvj0EJke7lBkGZRbeWF31v9XOSAHLg")
+genai.configure(api_key="AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM")
 
 # Function to chat with Gemini AI
 def chat_with_gemini(prompt):
