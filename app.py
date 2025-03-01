@@ -1,15 +1,19 @@
 import streamlit as st
 import google.generativeai as genai
-import docx  # For DOCX processing
+import docx
 import fitz
-# Set up API key (Replace with your actual API key)
-genai.configure(api_key="AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM")
+
+# Configure API key from Streamlit secrets
+genai.configure(api_key=st.secrets["AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM"])
 
 # Function to chat with Gemini AI
 def chat_with_gemini(prompt):
-    model = genai.GenerativeModel("gemini-pro")
-    response = model.generate_content(prompt)
-    return response.text
+    try:
+        model = genai.GenerativeModel("gemini-pro")
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"Error generating response: {e}"
 
 # Function to extract text from uploaded file
 def extract_text_from_file(uploaded_file):
@@ -17,19 +21,31 @@ def extract_text_from_file(uploaded_file):
         file_type = uploaded_file.type
 
         if file_type == "application/pdf":
-            doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")  # ✅ Use `fitz.open()`
-            text = ""
-            for page in doc:
-                text += page.get_text("text")  # ✅ Extract text correctly
-            return text
+            try:
+                doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
+                text = ""
+                for page in doc:
+                    text += page.get_text("text")
+                return text
+            except Exception as e:
+                return f"Error processing PDF: {e}"
 
         elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            doc = docx.Document(uploaded_file)
-            text = "\n".join([para.text for para in doc.paragraphs])
-            return text
+            try:
+                doc = docx.Document(uploaded_file)
+                text = "\n".join([para.text for para in doc.paragraphs])
+                return text
+            except Exception as e:
+                return f"Error processing DOCX: {e}"
+
+        elif file_type == "text/plain":
+            try:
+              return uploaded_file.getvalue().decode("utf-8")
+            except Exception as e:
+                return f"Error processing TXT: {e}"
 
         else:
-            return "❌ Unsupported file format. Please upload a PDF or DOCX file."
+            return "❌ Unsupported file format. Please upload a PDF, DOCX, or TXT file."
 
 # Streamlit UI with Chat History
 st.set_page_config(page_title="AI Research Chatbot", page_icon="🤖", layout="wide")
@@ -56,9 +72,11 @@ file_text = ""
 
 if uploaded_file:
     file_text = extract_text_from_file(uploaded_file)
-    if file_text:
+    if file_text and not file_text.startswith("Error"):
         st.success("✅ File uploaded successfully!")
         st.text_area("Extracted Text (Preview):", file_text[:1000], height=150)
+    elif file_text:
+        st.error(file_text)
 
 # User Input Section
 user_input = st.chat_input("Type your question here...")
@@ -82,3 +100,13 @@ if user_input:
     # Display AI response
     with st.chat_message("assistant"):
         st.markdown(ai_response)
+
+# Debugging section to list models.
+try:
+    models = genai.list_models()
+    st.sidebar.write("Available Models:")
+    for model in models:
+        st.sidebar.write(f"- {model.name}")
+
+except Exception as e:
+    st.sidebar.error(f"Error listing models: {e}")
