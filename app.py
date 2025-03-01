@@ -1,38 +1,26 @@
 import streamlit as st
 import google.generativeai as genai
-import os
 import docx  # For DOCX processing
-import fitz  # PyMuPDF for PDF processing
-
-# ✅ Securely load API key
-api_key = os.getenv("AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM")  # Try environment variable first
-if not api_key:
-    try:
-        api_key = st.secrets["gemini_api_key"]  # Try Streamlit Secrets
-    except Exception:
-        st.error("❌ Missing API Key! Set `GEMINI_API_KEY` as an environment variable or in Streamlit Secrets.")
-        st.stop()
-
-# ✅ Configure Google Gemini AI
-genai.configure(api_key=api_key)
+import fitz
+# Set up API key (Replace with your actual API key)
+genai.configure(api_key="AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM")
 
 # Function to chat with Gemini AI
 def chat_with_gemini(prompt):
-    try:
-        model = genai.GenerativeModel("gemini-pro")
-        response = model.generate_content(prompt)
-        return response.text
-    except Exception as e:
-        return f"⚠️ Error: {str(e)}"
+    model = genai.GenerativeModel("gemini-pro")
+    response = model.generate_content(prompt)
+    return response.text
 
-# Function to extract text from uploaded files
+# Function to extract text from uploaded file
 def extract_text_from_file(uploaded_file):
     if uploaded_file is not None:
         file_type = uploaded_file.type
 
         if file_type == "application/pdf":
-            doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
-            text = "\n".join([page.get_text("text") for page in doc])
+            doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")  # ✅ Use `fitz.open()`
+            text = ""
+            for page in doc:
+                text += page.get_text("text")  # ✅ Extract text correctly
             return text
 
         elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
@@ -43,9 +31,10 @@ def extract_text_from_file(uploaded_file):
         else:
             return "❌ Unsupported file format. Please upload a PDF or DOCX file."
 
-# Streamlit UI
+# Streamlit UI with Chat History
 st.set_page_config(page_title="AI Research Chatbot", page_icon="🤖", layout="wide")
 
+# Sidebar
 st.sidebar.title("🔍 Research Assistant Chatbot")
 st.sidebar.write("💡Powered by Shamiul Islam [Facebook](https://www.facebook.com/samiulislam.693)")
 st.sidebar.write("📄 Upload a research document and ask AI about it.")
@@ -76,15 +65,20 @@ user_input = st.chat_input("Type your question here...")
 if user_input:
     full_prompt = f"Document Content:\n{file_text}\n\nUser Question:\n{user_input}" if file_text else user_input
 
+    # Append user message to session state
     st.session_state.messages.append({"role": "user", "content": user_input})
 
+    # Display user message
     with st.chat_message("user"):
         st.markdown(user_input)
 
+    # Get AI response
     with st.spinner("Thinking... 🤖💭"):
         ai_response = chat_with_gemini(full_prompt)
 
+    # Append AI response to session state
     st.session_state.messages.append({"role": "assistant", "content": ai_response})
 
+    # Display AI response
     with st.chat_message("assistant"):
         st.markdown(ai_response)
