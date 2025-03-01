@@ -5,7 +5,7 @@ import fitz  # PyMuPDF for PDF handling
 import os
 
 # Configure API Key securely
-api_key = st.secrets.get("gemini_api_key", os.getenv("AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM"))
+api_key = st.secrets.get("AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM", os.getenv("AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM"))
 
 if not api_key:
     st.error("❌ Missing API Key! Please set GEMINI_API_KEY in Streamlit Secrets or as an environment variable.")
