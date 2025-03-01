@@ -1,16 +1,17 @@
 import streamlit as st
 import google.generativeai as genai
 import docx
-import fitz  # PyMuPDF for PDF handling
+import fitz  # PyMuPDF for PDFs
 import os
 
-# Configure API Key securely
-api_key = st.secrets.get("AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM", os.getenv("AIzaSyCeFuy9rjWIlA3GqIJUBjLdqg2wa8BA7JM"))
+# Load API key securely
+api_key = st.secrets.get("gemini_api_key") or os.getenv("GEMINI_API_KEY")
 
 if not api_key:
-    st.error("❌ Missing API Key! Please set GEMINI_API_KEY in Streamlit Secrets or as an environment variable.")
+    st.error("❌ Missing API Key! Please set `gemini_api_key` in Streamlit Secrets or as an environment variable.")
     st.stop()
 
+# Configure Google Gemini API
 try:
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-pro")
@@ -18,7 +19,7 @@ except Exception as e:
     st.error(f"⚠️ Error configuring Gemini API: {e}")
     st.stop()
 
-# Function to interact with Gemini AI
+# Function to chat with Gemini AI
 def chat_with_gemini(prompt):
     try:
         response = model.generate_content(prompt)
@@ -29,7 +30,7 @@ def chat_with_gemini(prompt):
 # Function to extract text from uploaded files
 def extract_text_from_file(uploaded_file):
     if uploaded_file is None:
-        return "No file uploaded."
+        return ""
 
     file_type = uploaded_file.type
 
