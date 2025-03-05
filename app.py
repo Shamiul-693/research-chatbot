@@ -75,7 +75,7 @@ for message in st.session_state.messages:
 # Add a "Clear Chat" button
 if st.sidebar.button("🗑️ Clear Chat"):
     st.session_state.messages = []
-    st.rerun()
+    st.rerun()  # ✅ Fixed: Use st.rerun() instead of st.experimental_rerun()
 
 # Display Chat Messages
 st.title("🚀 AI Research Assistant - SamBotChat")
@@ -118,9 +118,6 @@ if user_input:
     with st.chat_message("assistant"):
         st.markdown(f"**AI:**\n\n{ai_response}")
 
-    # Auto-scroll to the latest message
-    st.experimental_rerun()
-
 # **Image Generation Section**
 st.sidebar.subheader("🎨 Generate an AI Image")
 image_prompt = st.sidebar.text_input("Enter an image description:")
@@ -128,6 +125,6 @@ if st.sidebar.button("🖼️ Generate Image"):
     if image_prompt:
         with st.spinner("Creating image... 🎨"):
             generated_image = generate_image(image_prompt)
-            st.sidebar.image(generated_image, caption="Generated Image", use_column_width=True)
+            st.sidebar.image(generated_image, caption="Generated Image", use_container_width=True)  # ✅ Fixed: use_container_width
     else:
         st.sidebar.error("❌ Please enter a prompt to generate an image.")
