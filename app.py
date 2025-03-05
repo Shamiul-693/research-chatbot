@@ -21,9 +21,6 @@ def chat_with_gemini(prompt):
         return f"❌ Error: {str(e)}"
 
 
-# Function to generate an image using Gemini
-
-
 # Function to extract text from uploaded file
 def extract_text_from_file(uploaded_file):
     if uploaded_file is not None:
@@ -59,7 +56,7 @@ st.sidebar.write("📄 Upload a research document and ask AI about it.")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# **Show chat history in sidebar**
+# Show chat history in sidebar
 st.sidebar.subheader("🗂️ Chat History")
 for message in st.session_state.messages:
     role = "👤 You" if message["role"] == "user" else "🤖 AI"
@@ -111,6 +108,24 @@ if user_input:
     with st.chat_message("assistant"):
         st.markdown(f"**AI:**\n\n{ai_response}")
 
-# **Image Generation Section**
 
+# **Save Chat History as Bullet Points**
+def save_chat_history():
+    chat_history = "📝 Chat History\n\n"
+    for message in st.session_state.messages:
+        role = "You" if message["role"] == "user" else "AI"
+        chat_history += f"• {role}: {message['content'][:100]}...\n"  # Preview first 100 chars for each message
+    return chat_history
+
+
+# Add a button to download chat history as a text file
+if st.button("Save Chat History as Bullet Points"):
+    chat_history_text = save_chat_history()
     
+    # Convert chat history to a downloadable text file
+    st.download_button(
+        label="Download Chat History",
+        data=chat_history_text,
+        file_name="chat_history.txt",
+        mime="text/plain",
+    )
