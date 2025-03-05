@@ -1,15 +1,22 @@
 import streamlit as st
 import google.generativeai as genai
 import docx  # For DOCX processing
-import fitz
-# Set up API key (Replace with your actual API key)
-genai.configure(api_key="AIzaSyCxpgc1W-doNwBBa32_L3jjQi1TWVu5D6g")
+import fitz  # PyMuPDF for PDF processing
+
+# Configure API Key Securely
+if "api_key" in st.secrets:
+    genai.configure(api_key=st.secrets["AIzaSyCAG3OXqgCIRzqSHM-M7l7l2Z-nyrIsdho"])
+else:
+    st.error("❌ API Key not found. Please configure it in Streamlit secrets.")
 
 # Function to chat with Gemini AI
 def chat_with_gemini(prompt):
-    model = genai.GenerativeModel("gemini-pro")
-    response = model.generate_content(prompt)
-    return response.text
+    try:
+        model = genai.GenerativeModel("gemini-pro")
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
 
 # Function to extract text from uploaded file
 def extract_text_from_file(uploaded_file):
@@ -17,13 +24,13 @@ def extract_text_from_file(uploaded_file):
         file_type = uploaded_file.type
 
         if file_type == "application/pdf":
-            doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")  # ✅ Use `fitz.open()`
-            text = ""
-            for page in doc:
-                text += page.get_text("text")  # ✅ Extract text correctly
+            uploaded_file.seek(0)  # Reset file pointer
+            doc = fitz.open(stream=uploaded_file.read(), filetype="pdf")
+            text = "\n".join([page.get_text("text") for page in doc])
             return text
 
         elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            uploaded_file.seek(0)  # Reset file pointer
             doc = docx.Document(uploaded_file)
             text = "\n".join([para.text for para in doc.paragraphs])
             return text
@@ -36,7 +43,7 @@ st.set_page_config(page_title="AI Research Chatbot", page_icon="🤖", layout="w
 
 # Sidebar
 st.sidebar.title("🔍 Research Assistant Chatbot")
-st.sidebar.write("💡Powered by Shamiul Islam [Facebook](https://www.facebook.com/samiulislam.693)")
+st.sidebar.write("💡Powered by [Shamiul Islam](https://www.facebook.com/samiulislam.693)")
 st.sidebar.write("📄 Upload a research document and ask AI about it.")
 
 # Initialize chat history
@@ -51,7 +58,7 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # File Upload Section
-uploaded_file = st.file_uploader("📂 Upload your research paper (PDF, DOCX, TXT)", type=["pdf", "docx", "txt"])
+uploaded_file = st.file_uploader("📂 Upload your research paper (PDF, DOCX)", type=["pdf", "docx"])
 file_text = ""
 
 if uploaded_file:
