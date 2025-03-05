@@ -4,10 +4,15 @@ import docx  # For DOCX processing
 import fitz  # PyMuPDF for PDF processing
 
 # Configure API Key Securely
-if "api_key" in st.secrets:
-    genai.configure(api_key=st.secrets["AIzaSyCAG3OXqgCIRzqSHM-M7l7l2Z-nyrIsdho"])
+
+
+# Configure API Key
+api_key = st.secrets.get("api_key")
+if api_key:
+    genai.configure(api_key=api_key)
 else:
     st.error("❌ API Key not found. Please configure it in Streamlit secrets.")
+
 
 # Function to chat with Gemini AI
 def chat_with_gemini(prompt):
