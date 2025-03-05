@@ -7,7 +7,7 @@ import fitz  # PyMuPDF for PDF processing
 
 
 # Configure API Key
-api_key = st.secrets.get("api_key")
+api_key = st.secrets.get("AIzaSyCAG3OXqgCIRzqSHM-M7l7l2Z-nyrIsdho")
 if api_key:
     genai.configure(api_key=api_key)
 else:
