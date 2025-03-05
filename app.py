@@ -2,6 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 import docx  # For DOCX processing
 import fitz  # PyMuPDF for PDF processing
+import matplotlib.pyplot as plt  # For diagram generation
 
 # Configure API Key Securely
 api_key = st.secrets.get("api_key")
@@ -19,9 +20,6 @@ def chat_with_gemini(prompt):
         return response.text if response.text else "⚠️ AI could not generate a response. Try rephrasing your question!"
     except Exception as e:
         return f"❌ Error: {str(e)}"
-
-
-# Function to generate an image using Gemini
 
 
 # Function to extract text from uploaded file
@@ -47,6 +45,27 @@ def extract_text_from_file(uploaded_file):
         return text[:max_chars] + ("\n...\n⚠️ Document truncated for processing!" if len(text) > max_chars else "")
 
 
+# Summarization Function
+def summarize_document(text):
+    try:
+        model = genai.GenerativeModel("gemini-1.5-pro")
+        prompt = f"Please summarize the following document content:\n\n{text}"
+        response = model.generate_content(prompt)
+        return response.text if response.text else "⚠️ AI could not summarize the document."
+    except Exception as e:
+        return f"❌ Error: {str(e)}"
+
+
+# Diagram Generation (Example: Bar chart)
+def generate_diagram(data):
+    fig, ax = plt.subplots()
+    ax.bar(data.keys(), data.values(), color='skyblue')
+    ax.set_xlabel('Categories')
+    ax.set_ylabel('Values')
+    ax.set_title('Sample Bar Chart')
+    st.pyplot(fig)
+
+
 # Streamlit UI with Chat History
 st.set_page_config(page_title="AI Research Chatbot", page_icon="🤖", layout="wide")
 
@@ -59,7 +78,7 @@ st.sidebar.write("📄 Upload a research document and ask AI about it.")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# **Show chat history in sidebar**
+# Show chat history in sidebar
 st.sidebar.subheader("🗂️ Chat History")
 for message in st.session_state.messages:
     role = "👤 You" if message["role"] == "user" else "🤖 AI"
@@ -87,7 +106,16 @@ if uploaded_file:
         st.success("✅ File uploaded successfully!")
         st.text_area("Extracted Text (Preview):", file_text[:1000], height=150)
 
-# **User Input Section**
+# Summarize Document Section
+if st.button("Summarize Document"):
+    if file_text:
+        summary = summarize_document(file_text)
+        st.subheader("Document Summary")
+        st.write(summary)
+    else:
+        st.warning("❌ Please upload a document first.")
+
+# User Input Section
 user_input = st.chat_input("Type your question here...")
 
 if user_input:
@@ -111,6 +139,7 @@ if user_input:
     with st.chat_message("assistant"):
         st.markdown(f"**AI:**\n\n{ai_response}")
 
-# **Image Generation Section**
-
-    
+# Diagram Generation Section (Example)
+if st.button("Generate Diagram"):
+    sample_data = {"Category A": 10, "Category B": 20, "Category C": 30}
+    generate_diagram(sample_data)
