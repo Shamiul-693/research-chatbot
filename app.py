@@ -56,11 +56,14 @@ st.sidebar.write("📄 Upload a research document and ask AI about it.")
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Show chat history in sidebar
+# Show chat history in sidebar with expander
 st.sidebar.subheader("🗂️ Chat History")
-for message in st.session_state.messages:
+for idx, message in enumerate(st.session_state.messages):
     role = "👤 You" if message["role"] == "user" else "🤖 AI"
-    st.sidebar.text(f"{role}: {message['content'][:50]}...")  # Show short preview of messages
+    
+    # Use expander for each message: show heading by default
+    with st.sidebar.expander(f"{role}: {message['content'][:50]}..."):  # Show first 50 characters as heading
+        st.text(message['content'])  # Show full message when expanded
 
 # Add a "Clear Chat" button
 if st.sidebar.button("🗑️ Clear Chat"):
