@@ -19,7 +19,7 @@ import google.generativeai as genai
 
 def chat_with_gemini(prompt):
     try:
-        model = genai.GenerativeModel("gemini-pro")  # ✅ Correct model name
+        model = genai.GenerativeModel("gemini-1.5-pro")  # ✅ Correct model name
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
