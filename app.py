@@ -7,11 +7,11 @@ import fitz  # PyMuPDF for PDF processing
 
 
 # Configure API Key
-api_key = st.secrets.get("AIzaSyCAG3OXqgCIRzqSHM-M7l7l2Z-nyrIsdho")
-if api_key:
-    genai.configure(api_key=api_key)
-else:
+api_key = st.secrets.get("api_key")
+if not api_key:
     st.error("❌ API Key not found. Please configure it in Streamlit secrets.")
+else:
+    genai.configure(api_key=api_key)
 
 
 # Function to chat with Gemini AI
