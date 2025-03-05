@@ -24,12 +24,19 @@ def chat_with_gemini(prompt):
 # Function to generate an image using Gemini
 def generate_image(prompt):
     try:
-        model = genai.GenerativeModel("gemini-1.5-pro-vision")  # Gemini vision model
+        model = genai.GenerativeModel("gemini-1.5-pro-vision")  # Ensure the correct image model is used
         response = model.generate_content(prompt)
-        return response.text if response.text else "⚠️ Image generation failed. Try a different prompt!"
+
+        # Check if response contains valid image data
+        if hasattr(response, 'images') and response.images:
+            image_data = response.images[0]  # Get the first image
+            img = Image.open(io.BytesIO(image_data))  # Convert to PIL image
+            return img  # Return a valid image object
+
+        return None  # Return None if no valid image is generated
+
     except Exception as e:
         return f"❌ Error: {str(e)}"
-
 
 # Function to extract text from uploaded file
 def extract_text_from_file(uploaded_file):
@@ -121,10 +128,16 @@ if user_input:
 # **Image Generation Section**
 st.sidebar.subheader("🎨 Generate an AI Image")
 image_prompt = st.sidebar.text_input("Enter an image description:")
+
 if st.sidebar.button("🖼️ Generate Image"):
     if image_prompt:
         with st.spinner("Creating image... 🎨"):
             generated_image = generate_image(image_prompt)
-            st.sidebar.image(generated_image, caption="Generated Image", use_container_width=True)  # ✅ Fixed: use_container_width
+
+            if isinstance(generated_image, Image.Image):  # Check if valid image
+                st.sidebar.image(generated_image, caption="Generated Image", use_container_width=True)
+            else:
+                st.sidebar.error("❌ Failed to generate a valid image. Try a different prompt.")
+
     else:
         st.sidebar.error("❌ Please enter a prompt to generate an image.")
